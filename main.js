@@ -30,19 +30,20 @@ startBtn.addEventListener('click', async () => {
 });
 
 // --- ТВОЙ КОД ЗВУКА СВЕРХУ ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ ---
+// --- ВЕРХУШКА ТВОЕГО main.js С ОДИНОЧНОЙ КНОПКОЙ ЗВУКА START-BTN ОСТАЕТСЯ ---
 
-// --- НОВЫЙ СЕТЕВОЙ БЛОК ДЛЯ РАДМИНА ---
+// --- НОВЫЙ СЕТЕВОЙ БЛОК ДЛЯ РАДМИНА (СТРОГО ПОД НАШ HTML) ---
 const networkStatus = document.getElementById('network-status');
 const friendIpInput = document.getElementById('friend-ip');
-const connectBtn = document.getElementById('connect-btn');
+const connectBtn = document.getElementById('connect-btn'); // Ищем строго connect-btn!
 
+// Убедись, что ниже событие вешается именно на connectBtn!
 connectBtn.addEventListener('click', async () => {
     const ip = friendIpInput.value.trim();
     if (!ip) return alert("Сначала введи IP хоста из Радмин VPN!");
 
     networkStatus.innerText = `СЕТЬ: СВЯЗЬ С ХОСТОМ ${ip}...`;
 
-    // Тестовый пакет данных (завтра сюда привяжем ручки синтезатора)
     const testData = { note: "E4", cutoff: 920, timestamp: Date.now() };
 
     try {
@@ -64,6 +65,3 @@ connectBtn.addEventListener('click', async () => {
         networkStatus.style.color = "#ff0000";
     }
 });
-
-// Запускаем сеть автоматически при старте страницы
-initP2P();
