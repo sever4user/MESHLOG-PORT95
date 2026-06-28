@@ -36,17 +36,10 @@ function initP2P() {
     statusDiv.innerText = "СЕТЬ: ПОДКЛЮЧЕНИЕ К СИСТЕМЕ...";
     // main.js — БРОНЕБОЙНЫЙ P2P КОНФИГ БЕЗ CORS
     const peer = new Peer(undefined, {
-        host: 'peerjs-server.herokuapp.com', // Используем стабильное зеркало-хаб
+        host: 'glitch-peer-server.glitch.me', // Полностью независимый открытый сервер
         port: 443,
         secure: true,
-        path: '/',
-        config: {
-            'iceServers': [
-                { urls: 'stun:stun.l.google.com:19302' },    // Гугловские серверы сопряжения
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' }
-            ]
-        }
+        path: '/'
     });
 
     // Когда сеть успешно выдаст нам личный ID комнаты
