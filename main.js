@@ -29,37 +29,41 @@ startBtn.addEventListener('click', async () => {
     }
 });
 
-// --- СЕТЕВОЙ БЛОК PeerJS ---
-function initP2P() {
-    const statusDiv = document.getElementById('network-status');
-    
-    statusDiv.innerText = "СЕТЬ: ПОДКЛЮЧЕНИЕ К СИСТЕМЕ...";
-    // main.js — БРОНЕБОЙНЫЙ P2P КОНФИГ БЕЗ CORS
-    const peer = new Peer(undefined, {
-        host: 'glitch-peer-server.glitch.me', // Полностью независимый открытый сервер
-        port: 443,
-        secure: true,
-        path: '/'
-    });
+// --- ТВОЙ КОД ЗВУКА СВЕРХУ ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ ---
 
-    // Когда сеть успешно выдаст нам личный ID комнаты
-    peer.on('open', (id) => {
-        console.log('Мой P2P ID:', id);
-        statusDiv.innerText = `СЕТЬ АКТИВНА // ID КОМНАТЫ: ${id}`;
-        statusDiv.style.color = "#00ffcc";
-        statusDiv.style.textShadow = "0 0 5px #00ffcc";
-    });
+// --- НОВЫЙ СЕТЕВОЙ БЛОК ДЛЯ РАДМИНА ---
+const networkStatus = document.getElementById('network-status');
+const friendIpInput = document.getElementById('friend-ip');
+const connectBtn = document.getElementById('connect-btn');
 
-    // Ловим входящие подключения (когда друг решит подключиться к твоему ID)
-    peer.on('connection', (conn) => {
-        statusDiv.innerText = "СЕТЬ: ОБНАРУЖЕН НАПАРНИК! СИНХРОНИЗАЦИЯ...";
-        
-        conn.on('data', (data) => {
-            console.log('Получены панк-данные от друга:', data);
-            // Сюда завтра полетят изменения ручек и нот!
+connectBtn.addEventListener('click', async () => {
+    const ip = friendIpInput.value.trim();
+    if (!ip) return alert("Сначала введи IP хоста из Радмин VPN!");
+
+    networkStatus.innerText = `СЕТЬ: СВЯЗЬ С ХОСТОМ ${ip}...`;
+
+    // Тестовый пакет данных (завтра сюда привяжем ручки синтезатора)
+    const testData = { note: "E4", cutoff: 920, timestamp: Date.now() };
+
+    try {
+        const response = await fetch(`http://${ip}:5500/sync`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(testData)
         });
-    });
-}
+
+        if (response.ok) {
+            networkStatus.innerText = "СЕТЬ: УСПЕШНО СИНХРОНИЗИРОВАНО С ХОСТОМ!";
+            networkStatus.style.color = "#00ffcc";
+            networkStatus.style.textShadow = "0 0 5px #00ffcc";
+        }
+    } catch (err) {
+        console.error(err);
+        networkStatus.innerText = "СЕТЬ: ОШИБКА ПОДКЛЮЧЕНИЯ. ПРОВЕРЬ РАДМИН И СЕРВЕР!";
+        networkStatus.style.color = "#ff0000";
+    }
+});
 
 // Запускаем сеть автоматически при старте страницы
 initP2P();
