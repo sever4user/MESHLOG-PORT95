@@ -34,18 +34,19 @@ function initP2P() {
     const statusDiv = document.getElementById('network-status');
     
     statusDiv.innerText = "СЕТЬ: ПОДКЛЮЧЕНИЕ К СИСТЕМЕ...";
-
-    // Создаем новое P2P подключение. 
-    // Браузер сам постучится на бесплатный сервер PeerJS, чтобы получить уникальный ID.
-    // Заменяем const peer = new Peer(); на конфиг со стабильным сервером:
-// Заменяем const peer = new Peer(); на конфиг со стабильным сервером:
-    // Полностью заменяем блок создания Peer на этот рабочий резерв:
-    // main.js — НАСТОЯЩИЙ ГЛОБАЛЬНЫЙ P2P КОНФИГ
+    // main.js — БРОНЕБОЙНЫЙ P2P КОНФИГ БЕЗ CORS
     const peer = new Peer(undefined, {
-        host: "peerjs.com",
+        host: 'peerjs-server.herokuapp.com', // Используем стабильное зеркало-хаб
         port: 443,
         secure: true,
-        path: "/"
+        path: '/',
+        config: {
+            'iceServers': [
+                { urls: 'stun:stun.l.google.com:19302' },    // Гугловские серверы сопряжения
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+        }
     });
 
     // Когда сеть успешно выдаст нам личный ID комнаты
