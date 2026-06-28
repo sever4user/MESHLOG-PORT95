@@ -1,81 +1,78 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>MESHLOG-PORT95</title>
-    <style>
-        body { 
-            background: #000; 
-            color: #00ffcc; 
-            font-family: monospace; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            gap: 15px; 
-        }
-        button, .download-btn { 
-            background: transparent; 
-            border: 2px solid #00ffcc; 
-            color: #00ffcc; 
-            padding: 12px 24px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            box-shadow: 0 0 10px #00ffcc; 
-            font-family: monospace; 
-            text-decoration: none; 
-            display: inline-block; 
-            text-align: center; 
-        }
-        button:hover, .download-btn:hover { 
-            background: #00ffcc; 
-            color: #000; 
-        }
-        input { 
-            background: #111; 
-            border: 1px solid #ff00ff; 
-            color: #ff00ff; 
-            padding: 10px; 
-            font-family: monospace; 
-            text-align: center; 
-            font-size: 16px; 
-            width: 250px; 
-        }
-        .panel { 
-            border: 1px dashed #ff00ff; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            align-items: center; 
-        }
-        #network-status { 
-            color: #ff00ff; 
-            font-size: 14px; 
-            text-shadow: 0 0 5px #ff00ff; 
-        }
-    </style>
-</head>
-<body>
+// =========================================================================
+// БЛОК 1: АУДИО-ЯДРО СИНТЕЗАТОРА
+// =========================================================================
+const startBtn = document.getElementById('start-btn');
+let audioCtx = null;
 
-    <button id="start-btn">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
+startBtn.addEventListener('click', () => {
+    // Инициализируем аудиоконтекст только после клика пользователя (требование браузеров)
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        console.log("Звуковое ядро успешно запущено!");
+        startBtn.innerText = "ЗВУКОВОЕ ЯДРО АКТИВНО";
+        startBtn.style.borderColor = "#ff00ff";
+        startBtn.style.boxShadow = "0 0 10px #ff00ff";
+        startBtn.style.color = "#ff00ff";
+        
+        // Тестовый писк, чтобы убедиться, что звук работает
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // Делаем негромко
+        osc.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5); // Затухание за 0.5 сек
+    }
+});
+
+// =========================================================================
+// БЛОК 2: СЕТЕВОЙ ШЛЮЗ РАДМИН VPN
+// =========================================================================
+const networkStatus = document.getElementById('network-status');
+const friendIpInput = document.getElementById('friend-ip');
+const connectBtn = document.getElementById('connect-btn');
+
+connectBtn.addEventListener('click', async () => {
+    const ip = friendIpInput.value.trim();
     
-    <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
+    // Проверка, что поле ввода не пустое
+    if (!ip) {
+        alert("Сначала введи IP хоста из Радмин VPN!");
+        return;
+    }
 
-    <div class="panel">
-        <h3>ЕСЛИ ТЫ ХОСТ (СТРИМЕР ЗВУКА):</h3>
-        <a href="https://github.com/sever4user/meshlog-port95/releases/download/v1.0.0/meshlog-server.exe" class="download-btn">🚀 СКАЧАТЬ СЕРВЕР ЗАПУСКА (.EXE)</a>
-        <p style="font-size: 10px; color: #666; max-width: 280px; text-align: center;">Просто скачай, запусти двойным кликом и не закрывай черное окно во время джема.</p>
-    </div>
+    networkStatus.innerText = `СЕТЬ: СВЯЗЬ С ХОСТОМ ${ip}...`;
+    networkStatus.style.color = "#ff00ff";
 
-    <div class="panel">
-        <h3>ЕСЛИ ТЫ ПОДКЛЮЧАЕШЬСЯ К ДРУГУ:</h3>
-        <input type="text" id="friend-ip" placeholder="ВВЕДИ IP ДРУГА ИЗ РАДМИНА">
-        <button id="connect-btn">СИНХРОНИЗИРОВАТЬ ДЖЕМ</button>
-    </div>
+    // Пакет тестовых данных, который улетит в exe-сервер
+    const testData = { 
+        note: "E4", 
+        cutoff: 920, 
+        timestamp: Date.now() 
+    };
 
-    <script src="main.js"></script>
-</body>
-</html>
+    try {
+        // Отправляем POST запрос прямо на локальный порт 5500 по IP Радмина
+        const response = await fetch(`http://${ip}:5500/sync`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(testData)
+        });
+
+        if (response.ok) {
+            networkStatus.innerText = "СЕТЬ: УСПЕШНО СИНХРОНИЗИРОВАНО С ХОСТОМ!";
+            networkStatus.style.color = "#00ffcc";
+            networkStatus.style.textShadow = "0 0 5px #00ffcc";
+        } else {
+            throw new Error("Сервер вернул ошибку");
+        }
+    } catch (err) {
+        console.error("Ошибка сети:", err);
+        networkStatus.innerText = "СЕТЬ: ОШИБКА ПОДКЛЮЧЕНИЯ. ПРОВЕРЬ РАДМИН И СЕРВЕР!";
+        networkStatus.style.color = "#ff0000";
+        networkStatus.style.textShadow = "0 0 5px #ff0000";
+    }
+});
