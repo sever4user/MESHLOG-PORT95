@@ -99,7 +99,7 @@ async function sendFilterToFriend(cutoffVal) {
         networkStatus.innerText = "СЕТЬ: ПОТЕРЯ СВЯЗИ С СЕРВЕРОМ ДРУГА!";
         networkStatus.style.color = "#ff0000";
     }
-});
+};
 
 // =========================================================================
 // БЛОК 3: АВТО-ПРИЕМ ДАННЫХ (ПОСТОЯННЫЙ ОПРОС СВОЕГО СЕРВЕРА)
