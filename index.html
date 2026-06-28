@@ -4,22 +4,76 @@
     <meta charset="UTF-8">
     <title>MESHLOG-PORT95</title>
     <style>
-        body { background: #000; color: #00ffcc; font-family: monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; gap: 15px; }
-        button, .download-btn { background: transparent; border: 2px solid #00ffcc; color: #00ffcc; padding: 12px 24px; font-size: 14px; cursor: pointer; box-shadow: 0 0 10px #00ffcc; font-family: monospace; text-decoration: none; display: inline-block; text-align: center; }
-        button:hover, .download-btn:hover { background: #00ffcc; color: #000; }
-        input { background: #111; border: 1px solid #ff00ff; color: #ff00ff; padding: 10px; font-family: monospace; text-align: center; font-size: 16px; width: 250px; }
-        .panel { border: 1px dashed #ff00ff; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
-        #network-status { color: #ff00ff; font-size: 14px; text-shadow: 0 0 5px #ff00ff; }
+        body { 
+            background: #000; 
+            color: #00ffcc; 
+            font-family: monospace; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            gap: 15px; 
+        }
+        button, .download-btn { 
+            background: transparent; 
+            border: 2px solid #00ffcc; 
+            color: #00ffcc; 
+            padding: 12px 24px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            box-shadow: 0 0 10px #00ffcc; 
+            font-family: monospace; 
+            text-decoration: none; 
+            display: inline-block; 
+            text-align: center; 
+        }
+        button:hover, .download-btn:hover { 
+            background: #00ffcc; 
+            color: #000; 
+        }
+        input { 
+            background: #111; 
+            border: 1px solid #ff00ff; 
+            color: #ff00ff; 
+            padding: 10px; 
+            font-family: monospace; 
+            text-align: center; 
+            font-size: 16px; 
+            width: 250px; 
+        }
+        .panel { 
+            border: 1px dashed #ff00ff; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            align-items: center; 
+        }
+        #network-status { 
+            color: #ff00ff; 
+            font-size: 14px; 
+            text-shadow: 0 0 5px #ff00ff; 
+        }
     </style>
 </head>
 <body>
+
     <button id="start-btn">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
+    
     <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
 
     <div class="panel">
         <h3>ЕСЛИ ТЫ ХОСТ (СТРИМЕР ЗВУКА):</h3>
-        <a href="https://github.com/sever4user/MESHLOG-PORT95/releases/download/v0.95/meshlog-server.exe" class="download-btn">🚀 СКАЧАТЬ СЕРВЕР ЗАПУСКА (.EXE)</a>
+        <a href="https://github.com/sever4user/meshlog-port95/releases/download/v1.0.0/meshlog-server.exe" class="download-btn">🚀 СКАЧАТЬ СЕРВЕР ЗАПУСКА (.EXE)</a>
         <p style="font-size: 10px; color: #666; max-width: 280px; text-align: center;">Просто скачай, запусти двойным кликом и не закрывай черное окно во время джема.</p>
+    </div>
+
+    <div class="panel">
+        <h3>ЕСЛИ ТЫ ПОДКЛЮЧАЕШЬСЯ К ДРУГУ:</h3>
+        <input type="text" id="friend-ip" placeholder="ВВЕДИ IP ДРУГА ИЗ РАДМИНА">
+        <button id="connect-btn">СИНХРОНИЗИРОВАТЬ ДЖЕМ</button>
     </div>
 
     <script src="main.js"></script>
