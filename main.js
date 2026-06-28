@@ -1,67 +1,81 @@
-// main.js
-const startBtn = document.getElementById('start-btn');
-
-startBtn.addEventListener('click', async () => {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    if (audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-    }
-
-    try {
-        // 1. Загружаем наш изолированный аудио-скрипт в ворклет
-        await audioCtx.audioWorklet.addModule('core.js');
-        
-        // 2. Создаем узел на основе нашего процессора
-        const meshLogNode = new AudioWorkletNode(audioCtx, 'meshlog-core-processor');
-        
-        // 3. Подключаем виртуальный кабель к выходу колонок
-        meshLogNode.connect(audioCtx.destination);
-        
-        startBtn.innerText = "ИЗОЛИРОВАННОЕ ЯДРО АКТИВНО (WASM ПОТОК)";
-        startBtn.style.borderColor = "#00ffcc";
-        startBtn.style.color = "#00ffcc";
-        startBtn.style.boxShadow = "0 0 20px #00ffcc";
-
-    } catch (e) {
-        console.error("Ошибка инициализации ядра:", e);
-        startBtn.innerText = "СБОЙ ИНИЦИАЛИЗАЦИИ";
-    }
-});
-
-// --- ТВОЙ КОД ЗВУКА СВЕРХУ ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ ---
-// --- ВЕРХУШКА ТВОЕГО main.js С ОДИНОЧНОЙ КНОПКОЙ ЗВУКА START-BTN ОСТАЕТСЯ ---
-
-// --- НОВЫЙ СЕТЕВОЙ БЛОК ДЛЯ РАДМИНА (СТРОГО ПОД НАШ HTML) ---
-const networkStatus = document.getElementById('network-status');
-const friendIpInput = document.getElementById('friend-ip');
-const connectBtn = document.getElementById('connect-btn'); // Ищем строго connect-btn!
-
-// Убедись, что ниже событие вешается именно на connectBtn!
-connectBtn.addEventListener('click', async () => {
-    const ip = friendIpInput.value.trim();
-    if (!ip) return alert("Сначала введи IP хоста из Радмин VPN!");
-
-    networkStatus.innerText = `СЕТЬ: СВЯЗЬ С ХОСТОМ ${ip}...`;
-
-    const testData = { note: "E4", cutoff: 920, timestamp: Date.now() };
-
-    try {
-        const response = await fetch(`http://${ip}:5500/sync`, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(testData)
-        });
-
-        if (response.ok) {
-            networkStatus.innerText = "СЕТЬ: УСПЕШНО СИНХРОНИЗИРОВАНО С ХОСТОМ!";
-            networkStatus.style.color = "#00ffcc";
-            networkStatus.style.textShadow = "0 0 5px #00ffcc";
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MESHLOG-PORT95</title>
+    <style>
+        body { 
+            background: #000; 
+            color: #00ffcc; 
+            font-family: monospace; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            gap: 15px; 
         }
-    } catch (err) {
-        console.error(err);
-        networkStatus.innerText = "СЕТЬ: ОШИБКА ПОДКЛЮЧЕНИЯ. ПРОВЕРЬ РАДМИН И СЕРВЕР!";
-        networkStatus.style.color = "#ff0000";
-    }
-});
+        button, .download-btn { 
+            background: transparent; 
+            border: 2px solid #00ffcc; 
+            color: #00ffcc; 
+            padding: 12px 24px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            box-shadow: 0 0 10px #00ffcc; 
+            font-family: monospace; 
+            text-decoration: none; 
+            display: inline-block; 
+            text-align: center; 
+        }
+        button:hover, .download-btn:hover { 
+            background: #00ffcc; 
+            color: #000; 
+        }
+        input { 
+            background: #111; 
+            border: 1px solid #ff00ff; 
+            color: #ff00ff; 
+            padding: 10px; 
+            font-family: monospace; 
+            text-align: center; 
+            font-size: 16px; 
+            width: 250px; 
+        }
+        .panel { 
+            border: 1px dashed #ff00ff; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            align-items: center; 
+        }
+        #network-status { 
+            color: #ff00ff; 
+            font-size: 14px; 
+            text-shadow: 0 0 5px #ff00ff; 
+        }
+    </style>
+</head>
+<body>
+
+    <button id="start-btn">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
+    
+    <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
+
+    <div class="panel">
+        <h3>ЕСЛИ ТЫ ХОСТ (СТРИМЕР ЗВУКА):</h3>
+        <a href="https://github.com/sever4user/meshlog-port95/releases/download/v1.0.0/meshlog-server.exe" class="download-btn">🚀 СКАЧАТЬ СЕРВЕР ЗАПУСКА (.EXE)</a>
+        <p style="font-size: 10px; color: #666; max-width: 280px; text-align: center;">Просто скачай, запусти двойным кликом и не закрывай черное окно во время джема.</p>
+    </div>
+
+    <div class="panel">
+        <h3>ЕСЛИ ТЫ ПОДКЛЮЧАЕШЬСЯ К ДРУГУ:</h3>
+        <input type="text" id="friend-ip" placeholder="ВВЕДИ IP ДРУГА ИЗ РАДМИНА">
+        <button id="connect-btn">СИНХРОНИЗИРОВАТЬ ДЖЕМ</button>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
