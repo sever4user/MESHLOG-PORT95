@@ -59,10 +59,15 @@
     </style>
 </head>
 <body>
-
     <button id="start-btn">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
-    
     <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
+
+    <div class="panel" style="border-color: #00ffcc;">
+        <h3>КОНТРОЛЬ СИНТЕЗАТОРА</h3>
+        <label for="cutoff-slider" style="font-size: 12px; color: #00ffcc;">CUTOFF FREQUENCY (ФИЛЬТР):</label>
+        <input type="range" id="cutoff-slider" min="40" max="4000" value="1000" style="width: 300px;">
+        <span id="cutoff-value" style="color: #ff00ff;">1000 Hz</span>
+    </div>
 
     <div class="panel">
         <h3>ЕСЛИ ТЫ ХОСТ (СТРИМЕР ЗВУКА):</h3>
