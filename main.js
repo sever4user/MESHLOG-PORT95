@@ -99,4 +99,46 @@ async function sendFilterToFriend(cutoffVal) {
         networkStatus.innerText = "СЕТЬ: ПОТЕРЯ СВЯЗИ С СЕРВЕРОМ ДРУГА!";
         networkStatus.style.color = "#ff0000";
     }
+});
+
+// =========================================================================
+// БЛОК 3: АВТО-ПРИЕМ ДАННЫХ (ПОСТОЯННЫЙ ОПРОС СВОЕГО СЕРВЕРА)
+// =========================================================================
+let lastReceivedTimestamp = 0;
+
+async function checkIncomingData() {
+    // Опрашиваем НАШ СОБСТВЕННЫЙ сервер (localhost), чтобы узнать, не прислал ли что-то друг
+    try {
+        const response = await fetch(`http://127.0.0.1:5500/fetch-sync`);
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Если прилетели НОВЫЕ данные (проверяем по времени timestamp)
+            if (data && data.timestamp > lastReceivedTimestamp) {
+                lastReceivedTimestamp = data.timestamp;
+
+                if (data.type === 'SYNTH_CUTOFF') {
+                    const incomingValue = data.value;
+                    
+                    // 1. Двигаем ползунок на экране хоста
+                    cutoffSlider.value = incomingValue;
+                    cutoffValue.innerText = `${incomingValue} Hz`;
+                    
+                    // 2. Меняем звук в реальном времени на ноуте хоста!
+                    if (filter && audioCtx) {
+                        filter.frequency.setValueAtTime(incomingValue, audioCtx.currentTime);
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        // Если сервер еще не запущен, просто молчим, чтобы не спамить в консоль
+    }
 }
+
+// Запускаем бесконечный цикл опроса: каждые 50 миллисекунд
+setInterval(checkIncomingData, 50);
+
+
+
+
