@@ -1,0 +1,106 @@
+/* =========================================================================
+   БРУТАЛЬНЫЙ ТЕРМИНАЛ // СТИЛИ ДЛЯ MESHLOG-PORT95
+   ========================================================================= */
+
+/* Обнуляем отступы и фиксируем экран, чтобы ничего не дергалось */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000000;
+    color: #00ffcc;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Общий контейнер для центрирования элементов на первом экране */
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Панк-кнопки и ссылки для скачивания */
+button, .download-btn {
+    background: transparent;
+    border: 2px solid #00ffcc;
+    color: #00ffcc;
+    padding: 12px 24px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+    transition: all 0.15s ease;
+}
+
+button:hover, .download-btn:hover {
+    background: #00ffcc;
+    color: #000000;
+    box-shadow: 0 0 15px #00ffcc;
+}
+
+/* Поля ввода IP-адресов */
+input[type="text"] {
+    background: #050505;
+    border: 1px solid #ff00ff;
+    color: #ff00ff;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    font-size: 15px;
+    width: 260px;
+    box-shadow: 0 0 5px rgba(255, 0, 255, 0.2);
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #00ffcc;
+    color: #00ffcc;
+    box-shadow: 0 0 10px #00ffcc;
+}
+
+/* Главные панели-контейнеры (Рэк) */
+.panel {
+    border: 1px dashed #ff00ff;
+    background: rgba(5, 5, 5, 0.9);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    max-width: 520px;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.1);
+}
+
+/* Текст статуса сети */
+#network-status {
+    color: #ff00ff;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px #ff00ff;
+}
+
+/* Вспомогательный блок кода в инструкции */
+code {
+    background: #111111;
+    color: #00ffcc;
+    padding: 6px;
+    display: block;
+    margin: 6px 0;
+    word-break: break-all;
+    font-size: 11px;
+    border-left: 2px solid #00ffcc;
+}
+
+/* Системный класс для скрытия неактивных экранов */
+.hidden {
+    display: none !important;
+}

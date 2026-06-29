@@ -3,65 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>MESHLOG-PORT95</title>
-    <style>
-        body { 
-            background: #000; 
-            color: #00ffcc; 
-            font-family: monospace; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            gap: 15px; 
-        }
-        button, .download-btn { 
-            background: transparent; 
-            border: 2px solid #00ffcc; 
-            color: #00ffcc; 
-            padding: 12px 24px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            box-shadow: 0 0 10px #00ffcc; 
-            font-family: monospace; 
-            text-decoration: none; 
-            display: inline-block; 
-            text-align: center; 
-        }
-        button:hover, .download-btn:hover { 
-            background: #00ffcc; 
-            color: #000; 
-        }
-        input { 
-            background: #111; 
-            border: 1px solid #ff00ff; 
-            color: #ff00ff; 
-            padding: 10px; 
-            font-family: monospace; 
-            text-align: center; 
-            font-size: 16px; 
-            width: 250px; 
-        }
-        .panel { 
-            border: 1px dashed #ff00ff; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            align-items: center; 
-            max-width: 500px;
-        }
-        #network-status { 
-            color: #ff00ff; 
-            font-size: 14px; 
-            text-shadow: 0 0 5px #ff00ff; 
-        }
-        /* Класс для скрытия экранов */
-        .hidden {
-            display: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -84,7 +26,7 @@
             1. Скачай нужный файл сервера.<br>
             2. Открой встроенное приложение <b>Терминал</b>.<br>
             3. Скопируй и выполни команду ниже (она выдаст права и запустит мост):<br>
-            <code style="background: #222; color: #00ffcc; padding: 4px; display: block; margin: 6px 0; word-break: break-all; font-size: 10px;">cd ~/Downloads && chmod +x meshlog-server-mac-arm64 && ./meshlog-server-mac-arm64</code>
+            <code style="background: #222; color: #00ffcc2c; padding: 4px; display: block; margin: 6px 0; word-break: break-all; font-size: 10px;">cd ~/Downloads && chmod +x meshlog-server-mac-arm64 && ./meshlog-server-mac-arm64</code>
             <span style="font-size: 9px; color: #666;">*Если у тебя процессор Intel, замени в конце arm64 на intel</span>
         </div>
 
@@ -99,15 +41,13 @@
         </div>
     </div>
 
-    <div id="work-screen" class="panel hidden" style="border-color: #ff00ff;">
-        <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
-        
-        <button id="start-btn" style="width: 100%;">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
-        
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px;">
-            <label for="cutoff-slider" style="font-size: 12px; color: #00ffcc;">CUTOFF FREQUENCY (АНАЛОГОВЫЙ ФИЛЬТР):</label>
-            <input type="range" id="cutoff-slider" min="40" max="4000" value="1000" style="width: 320px;">
-            <span id="cutoff-value" style="color: #ff00ff; font-size: 18px; font-weight: bold;">1000 Hz</span>
+    <div id="work-screen" class="hidden" style="position: absolute; top:0; left:0; width:100vw; height:100vh; overflow:hidden;">
+        <canvas id="cyber-canvas"></canvas>
+
+        <div style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.85); border: 1px solid #00ffcc; padding: 15px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; pointer-events: auto; box-shadow: 0 0 10px rgba(0,255,204,0.2);">
+            <div id="network-status">СЕТЬ: ОЖИДАНИЕ...</div>
+            <button id="start-btn" style="padding: 6px; font-size: 11px; box-shadow: none;">ИНИЦИАЛИЗИРОВАТЬ АУДИО-ЯДРО</button>
+            <div style="color: #666; font-size: 9px;">Зажми мышь и тащи холст для перемещения.<br>Кликни на ноду, чтобы крутить параметры.</div>
         </div>
     </div>
 
