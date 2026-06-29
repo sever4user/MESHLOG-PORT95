@@ -1,28 +1,8 @@
-// Кнопка и блок инструкции для Mac
-const macHelpBtn = document.getElementById('mac-help-btn');
-const macHelpBlock = document.getElementById('mac-help-block');
-
-macHelpBtn.addEventListener('click', () => {
-    // Переключаем класс hidden: если блок скрыт — покажем, если открыт — скроем
-    macHelpBlock.classList.toggle('hidden');
-    
-    if (macHelpBlock.classList.contains('hidden')) {
-        macHelpBtn.innerText = "❓ ИНСТРУКЦИЯ ДЛЯ MAC";
-    } else {
-        macHelpBtn.innerText = "❌ ЗАКРЫТЬ ИНСТРУКЦИЮ";
-    }
-});
-
-// Переключатели экранов
 const lobbyScreen = document.getElementById('lobby-screen');
 const workScreen = document.getElementById('work-screen');
-
-// Элементы управления звуком
 const startBtn = document.getElementById('start-btn');
 const cutoffSlider = document.getElementById('cutoff-slider');
 const cutoffValue = document.getElementById('cutoff-value');
-
-// Элементы сети
 const networkStatus = document.getElementById('network-status');
 const friendIpInput = document.getElementById('friend-ip');
 const connectBtn = document.getElementById('connect-btn');
@@ -31,57 +11,86 @@ const hostBtn = document.getElementById('host-btn');
 let audioCtx = null;
 let osc = null;
 let filter = null;
-let isConnected = false;
+let ws = null; // Наш единый сокет
 
 // =========================================================================
-// ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ЭКРАНОВ И ПОДКЛЮЧЕНИЯ
+// ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ WEBSOCKET СОЕДИНЕНИЯ
+// =========================================================================
+function initWebSocket(ip) {
+    ws = new WebSocket(`ws://${ip}:5500`);
+
+    ws.onopen = () => {
+        console.log(`[WS] Успешное подключение к серверу джема на ${ip}`);
+        if (ip === "127.0.0.1") {
+            networkStatus.innerText = `СЕТЬ: СЕССИЯ СОЗДАНА. ТВОЙ СЕРВЕР ЖДЕТ ДРУЗЕЙ!`;
+            networkStatus.style.color = "#ff00ff";
+        } else {
+            networkStatus.innerText = `СЕТЬ: УСПЕШНО ПОДКЛЮЧЕНО К ХОСТУ ${ip}!`;
+            networkStatus.style.color = "#00ffcc";
+        }
+    };
+
+    ws.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'SYNTH_CUTOFF') {
+                // Двигаем интерфейс
+                cutoffSlider.value = data.value;
+                cutoffValue.innerText = `${data.value} Hz`;
+                
+                // Меняем звук в реальном времени
+                if (filter && audioCtx) {
+                    filter.frequency.setValueAtTime(data.value, audioCtx.currentTime);
+                }
+            }
+        } catch (e) {}
+    };
+
+    ws.onclose = () => {
+        networkStatus.innerText = "СЕТЬ: СОЕДИНЕНИЕ ЗАКРЫТО. ПРОВЕРЬ СЕРВЕР ХОСТА!";
+        networkStatus.style.color = "#ff0000";
+    };
+    
+    ws.onerror = () => {
+        networkStatus.innerText = "СЕТЬ: ОШИБКА ПОДКЛЮЧЕНИЯ К СЕРВЕРУ!";
+        networkStatus.style.color = "#ff0000";
+    };
+}
+
+// =========================================================================
+// ЛОГИКА ЭКРАНОВ
 // =========================================================================
 
-// Вариант А: Если мы подключаемся к другу
+// Вариант А: Ты подключаешься к другу (сервер запущен У НЕГО)
 connectBtn.addEventListener('click', () => {
     const ip = friendIpInput.value.trim();
-    if (!ip) {
-        alert("Сначала введи IP друга из Радмин VPN!");
-        return;
-    }
+    if (!ip) return alert("Введи IP хоста из Радмин VPN!");
     
-    isConnected = true;
-    // Перекидываем в рабочее поле
     lobbyScreen.classList.add('hidden');
-    workScreen.classList.remove('work-screen', 'hidden');
+    workScreen.classList.remove('hidden');
     
-    networkStatus.innerText = `СЕТЬ: ПОДКЛЮЧЕНО К ХОСТУ ${ip}. ВКЛЮЧАЙ ЗВУК!`;
-    networkStatus.style.color = "#00ffcc";
-    
-    sendFilterToFriend(cutoffSlider.value);
+    // Подключаемся к удаленному серверу друга
+    initWebSocket(ip);
 });
 
-// Вариант Б: Если мы сами создаем сессию (ждем коннекта, шлем себе на localhost)
+// Вариант Б: Ты сам хост (сервер запущен У ТЕБЯ)
 hostBtn.addEventListener('click', () => {
-    // Автоматически подставляем локальный IP для теста или самоопроса
-    friendIpInput.value = "127.0.0.1";
-    isConnected = true;
-    
-    // Перекидываем в рабочее поле
     lobbyScreen.classList.add('hidden');
-    workScreen.classList.remove('work-screen', 'hidden');
+    workScreen.classList.remove('hidden');
     
-    networkStatus.innerText = `СЕТЬ: РЕЖИМ СВОЕЙ СЕССИИ (ЖДЕМ ДРУГА)`;
-    networkStatus.style.color = "#ff00ff";
-    
-    sendFilterToFriend(cutoffSlider.value);
+    // Подключаемся к своему локальному серверу
+    initWebSocket("127.0.0.1");
 });
 
 // =========================================================================
-// БЛОК 1: АУДИО-ЯДРО (СИНТЕЗАТОР)
+// АУДИО-ЯДРО И ОТПРАВКА ДАННЫХ В СОКЕТ
 // =========================================================================
 startBtn.addEventListener('click', () => {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
         osc = audioCtx.createOscillator();
         osc.type = 'sawtooth'; 
-        osc.frequency.setValueAtTime(110, audioCtx.currentTime); // Суб-бас Ля
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime); 
 
         filter = audioCtx.createBiquadFilter();
         filter.type = 'lowpass'; 
@@ -93,17 +102,15 @@ startBtn.addEventListener('click', () => {
         osc.connect(filter);
         filter.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-
         osc.start();
 
-        console.log("Звуковое ядро запущено!");
         startBtn.innerText = "СИНТ АКТИВЕН";
         startBtn.style.color = "#00ffcc";
         startBtn.style.borderColor = "#00ffcc";
     }
 });
 
-// Кручение ручки фильтра
+// Когда крутишь ручку — данные мгновенно улетают в WebSocket
 cutoffSlider.addEventListener('input', (e) => {
     const value = e.target.value;
     cutoffValue.innerText = `${value} Hz`;
@@ -111,62 +118,12 @@ cutoffSlider.addEventListener('input', (e) => {
     if (filter && audioCtx) {
         filter.frequency.setValueAtTime(value, audioCtx.currentTime);
     }
-    sendFilterToFriend(value);
-});
 
-// =========================================================================
-// БЛОК 2: СЕТЕВОЙ ШЛЮЗ (HTTP POST ДРУГУ)
-// =========================================================================
-async function sendFilterToFriend(cutoffVal) {
-    const ip = friendIpInput.value.trim();
-    if (!isConnected || !ip) return;
-
-    try {
-        await fetch(`http://${ip}:5500/sync`, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                type: 'SYNTH_CUTOFF',
-                value: Number(cutoffVal),
-                timestamp: Date.now() 
-            })
-        });
-    } catch (err) {
-        networkStatus.innerText = "СЕТЬ: ПОТЕРЯ СВЯЗИ С СЕРВЕРОМ ДРУГА!";
-        networkStatus.style.color = "#ff0000";
+    // Если сокет открыт — пушим JSON прямо туда
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ 
+            type: 'SYNTH_CUTOFF',
+            value: Number(value)
+        }));
     }
-}
-
-// =========================================================================
-// БЛОК 3: СОБЫТИЙНЫЙ ПРИЕМ (WEBSOCKET СВОЕГО СЕРВЕРА)
-// =========================================================================
-const ws = new WebSocket('ws://127.0.0.1:5500');
-let lastReceivedTimestamp = 0;
-
-ws.onopen = () => {
-    console.log("[WS] Локальный мост активен.");
-};
-
-ws.onmessage = (event) => {
-    try {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === 'SYNTH_CUTOFF' && data.timestamp > lastReceivedTimestamp) {
-            lastReceivedTimestamp = data.timestamp;
-            const incomingValue = data.value;
-            
-            cutoffSlider.value = incomingValue;
-            cutoffValue.innerText = `${incomingValue} Hz`;
-            
-            if (filter && audioCtx) {
-                filter.frequency.setValueAtTime(incomingValue, audioCtx.currentTime);
-            }
-        }
-    } catch (e) {}
-};
-
-ws.onerror = () => {};
-ws.onclose = () => {
-    console.log("[WS] Локальный мост закрыт.");
-};
+});
