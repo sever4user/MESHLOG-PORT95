@@ -7,48 +7,50 @@
 </head>
 <body>
 
-    <div id="lobby-screen" class="panel" style="border-color: #00ffcc;">
+    <div id="lobby-screen" class="panel">
         <h2>MESHLOG-PORT95 // СЕТЕВОЙ СЕКТОР</h2>
         
-        <p style="font-size: 12px; color: #666; margin: 0;">1. СКАЧАЙТЕ СЕТЕВОЙ МОСТ ПОД СВОЮ ОС:</p>
+        <p class="screen-label">1. СКАЧАЙТЕ СЕТЕВОЙ МОСТ ПОД СВОЮ ОС:</p>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <a href="meshlog-server.exe" class="download-btn" style="border-color: #00ffcc; color: #00ffcc; font-size: 11px;">🪟 WINDOWS (.EXE)</a>
-            <a href="meshlog-server-mac-arm64" class="download-btn" style="border-color: #ff00ff; color: #ff00ff; font-size: 11px;">🍏 MAC (M1/M2/M3)</a>
-            <a href="meshlog-server-mac-intel" class="download-btn" style="border-color: #ffff00; color: #ffff00; font-size: 11px;">🍏 MAC (INTEL)</a>
+            <a href="meshlog-server.exe" class="download-btn">🪟 WINDOWS (.EXE)</a>
+            <a href="meshlog-server-mac-arm64" class="download-btn">🍏 MAC (M1/M2/M3)</a>
+            <a href="meshlog-server-mac-intel" class="download-btn">🍏 MAC (INTEL)</a>
         </div>
 
-        <button id="mac-help-btn" style="border-color: #666; color: #aaa; box-shadow: none; font-size: 11px; padding: 5px 10px; margin-top: 5px;">
+        <button id="mac-help-btn">
             ❓ ИНСТРУКЦИЯ ДЛЯ MAC
         </button>
 
-        <div id="mac-help-block" class="hidden" style="padding: 10px; border: 1px dashed #ff00ff; max-width: 400px; text-align: left; font-size: 11px; color: #aaa; background: #050505;">
+        <div id="mac-help-block" class="hidden">
             <b style="color: #ff00ff;">⚠️ ЗАПУСК НА СИСТЕМЕ MAC:</b><br>
             1. Скачай нужный файл сервера.<br>
             2. Открой встроенное приложение <b>Терминал</b>.<br>
             3. Скопируй и выполни команду ниже (она выдаст права и запустит мост):<br>
-            <code style="background: #222; color: #00ffcc2c; padding: 4px; display: block; margin: 6px 0; word-break: break-all; font-size: 10px;">cd ~/Downloads && chmod +x meshlog-server-mac-arm64 && ./meshlog-server-mac-arm64</code>
+            <code>cd ~/Downloads && chmod +x meshlog-server-mac-arm64 && ./meshlog-server-mac-arm64</code>
             <span style="font-size: 9px; color: #666;">*Если у тебя процессор Intel, замени в конце arm64 на intel</span>
         </div>
 
         <hr style="width: 100%; border: 0; border-top: 1px dashed #333; margin: 10px 0;">
 
-        <p style="font-size: 12px; color: #666; margin: 0;">2. ИНИЦИАЛИЗАЦИЯ СЕССИИ ДЖЕМА:</p>
+        <p class="screen-label">2. ИНИЦИАЛИЗАЦИЯ СЕССИИ ДЖЕМА:</p>
         <input type="text" id="friend-ip" placeholder="ВВЕДИ IP ДРУГА ИЗ РАДМИНА">
         
         <div style="display: flex; gap: 15px;">
             <button id="connect-btn">ПОДКЛЮЧИТЬСЯ К ДРУГУ</button>
-            <button id="host-btn" style="border-color: #ff00ff; color: #ff00ff; box-shadow: 0 0 10px #ff00ff;">СОЗДАТЬ СЕССИЮ</button>
+            <button id="host-btn">СОЗДАТЬ СЕССИЮ</button>
         </div>
     </div>
 
-    <div id="work-screen" class="hidden" style="position: absolute; top:0; left:0; width:100vw; height:100vh; overflow:hidden;">
+    <div id="work-screen" class="hidden">
+        
         <canvas id="cyber-canvas"></canvas>
 
-        <div style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.85); border: 1px solid #00ffcc; padding: 15px; font-size: 11px; display: flex; flex-direction: column; gap: 8px; pointer-events: auto; box-shadow: 0 0 10px rgba(0,255,204,0.2);">
+        <div id="work-overlay">
             <div id="network-status">СЕТЬ: ОЖИДАНИЕ...</div>
-            <button id="start-btn" style="padding: 6px; font-size: 11px; box-shadow: none;">ИНИЦИАЛИЗИРОВАТЬ АУДИО-ЯДРО</button>
+            <button id="start-btn">ИНИЦИАЛИЗИРОВАТЬ АУДИО-ЯДРО</button>
             <div style="color: #666; font-size: 9px;">Зажми мышь и тащи холст для перемещения.<br>Кликни на ноду, чтобы крутить параметры.</div>
         </div>
+
     </div>
 
     <script src="main.js"></script>

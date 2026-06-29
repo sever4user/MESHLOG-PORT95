@@ -6,6 +6,10 @@ const friendIpInput = document.getElementById('friend-ip');
 const connectBtn = document.getElementById('connect-btn');
 const hostBtn = document.getElementById('host-btn');
 
+// Кнопка и блок инструкции для Mac
+const macHelpBtn = document.getElementById('mac-help-btn');
+const macHelpBlock = document.getElementById('mac-help-block');
+
 // Графическое ядро холста
 const canvas = document.getElementById('cyber-canvas');
 const ctx = canvas.getContext('2d');
@@ -188,6 +192,20 @@ function modifyNodeValue(e) {
         }));
     }
 }
+
+// =========================================================================
+// ЛОГИКА ЭКРАНОВ
+// =========================================================================
+macHelpBtn.addEventListener('click', () => {
+    // Переключаем класс hidden: если блок скрыт — покажем, если открыт — скроем
+    macHelpBlock.classList.toggle('hidden');
+    
+    if (macHelpBlock.classList.contains('hidden')) {
+        macHelpBtn.innerText = "❓ ИНСТРУКЦИЯ ДЛЯ MAC";
+    } else {
+        macHelpBtn.innerText = "❌ ЗАКРЫТЬ ИНСТРУКЦИЮ";
+    }
+});
 
 // =========================================================================
 // СЕТЕВАЯ И АУДИО СИНХРОНИЗАЦИЯ
