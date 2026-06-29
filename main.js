@@ -1,86 +1,125 @@
-// =========================================================================
-// БЛОК 1: АУДИО-ЯДРО (СИНТЕЗАТОР С ФИЛЬТРОМ)
-// =========================================================================
+// Кнопка и блок инструкции для Mac
+const macHelpBtn = document.getElementById('mac-help-btn');
+const macHelpBlock = document.getElementById('mac-help-block');
+
+macHelpBtn.addEventListener('click', () => {
+    // Переключаем класс hidden: если блок скрыт — покажем, если открыт — скроем
+    macHelpBlock.classList.toggle('hidden');
+    
+    if (macHelpBlock.classList.contains('hidden')) {
+        macHelpBtn.innerText = "❓ ИНСТРУКЦИЯ ДЛЯ MAC";
+    } else {
+        macHelpBtn.innerText = "❌ ЗАКРЫТЬ ИНСТРУКЦИЮ";
+    }
+});
+
+// Переключатели экранов
+const lobbyScreen = document.getElementById('lobby-screen');
+const workScreen = document.getElementById('work-screen');
+
+// Элементы управления звуком
 const startBtn = document.getElementById('start-btn');
 const cutoffSlider = document.getElementById('cutoff-slider');
 const cutoffValue = document.getElementById('cutoff-value');
 
+// Элементы сети
+const networkStatus = document.getElementById('network-status');
+const friendIpInput = document.getElementById('friend-ip');
+const connectBtn = document.getElementById('connect-btn');
+const hostBtn = document.getElementById('host-btn');
+
 let audioCtx = null;
 let osc = null;
 let filter = null;
+let isConnected = false;
 
+// =========================================================================
+// ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ЭКРАНОВ И ПОДКЛЮЧЕНИЯ
+// =========================================================================
+
+// Вариант А: Если мы подключаемся к другу
+connectBtn.addEventListener('click', () => {
+    const ip = friendIpInput.value.trim();
+    if (!ip) {
+        alert("Сначала введи IP друга из Радмин VPN!");
+        return;
+    }
+    
+    isConnected = true;
+    // Перекидываем в рабочее поле
+    lobbyScreen.classList.add('hidden');
+    workScreen.classList.remove('work-screen', 'hidden');
+    
+    networkStatus.innerText = `СЕТЬ: ПОДКЛЮЧЕНО К ХОСТУ ${ip}. ВКЛЮЧАЙ ЗВУК!`;
+    networkStatus.style.color = "#00ffcc";
+    
+    sendFilterToFriend(cutoffSlider.value);
+});
+
+// Вариант Б: Если мы сами создаем сессию (ждем коннекта, шлем себе на localhost)
+hostBtn.addEventListener('click', () => {
+    // Автоматически подставляем локальный IP для теста или самоопроса
+    friendIpInput.value = "127.0.0.1";
+    isConnected = true;
+    
+    // Перекидываем в рабочее поле
+    lobbyScreen.classList.add('hidden');
+    workScreen.classList.remove('work-screen', 'hidden');
+    
+    networkStatus.innerText = `СЕТЬ: РЕЖИМ СВОЕЙ СЕССИИ (ЖДЕМ ДРУГА)`;
+    networkStatus.style.color = "#ff00ff";
+    
+    sendFilterToFriend(cutoffSlider.value);
+});
+
+// =========================================================================
+// БЛОК 1: АУДИО-ЯДРО (СИНТЕЗАТОР)
+// =========================================================================
 startBtn.addEventListener('click', () => {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        // 1. Создаем осциллятор (генератор жесткой пилы в стиле синти-вейв)
         osc = audioCtx.createOscillator();
         osc.type = 'sawtooth'; 
-        osc.frequency.setValueAtTime(110, audioCtx.currentTime); // Нота Ля суб-баса (110 Гц)
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime); // Суб-бас Ля
 
-        // 2. Создаем аналоговый низкочастотный фильтр
         filter = audioCtx.createBiquadFilter();
         filter.type = 'lowpass'; 
         filter.frequency.setValueAtTime(cutoffSlider.value, audioCtx.currentTime);
 
-        // 3. Узел громкости для защиты ушей
         const gainNode = audioCtx.createGain();
         gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); 
 
-        // Соединяем цепь: Осциллятор -> Фильтр -> Громкость -> Колонки
         osc.connect(filter);
         filter.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
         osc.start();
 
-        console.log("Звуковое ядро и фильтр успешно запущены!");
+        console.log("Звуковое ядро запущено!");
         startBtn.innerText = "СИНТ АКТИВЕН";
-        startBtn.style.color = "#ff00ff";
-        startBtn.style.borderColor = "#ff00ff";
+        startBtn.style.color = "#00ffcc";
+        startBtn.style.borderColor = "#00ffcc";
     }
 });
 
-// Локальное кручение ручки фильтра мышью
+// Кручение ручки фильтра
 cutoffSlider.addEventListener('input', (e) => {
     const value = e.target.value;
     cutoffValue.innerText = `${value} Hz`;
     
-    // Если звук запущен — мгновенно меняем частоту фильтра у себя
     if (filter && audioCtx) {
         filter.frequency.setValueAtTime(value, audioCtx.currentTime);
     }
-
-    // И пулей отправляем это действие другу в сеть Радмина
     sendFilterToFriend(value);
 });
 
-
 // =========================================================================
-// БЛОК 2: СЕТЕВОЙ ШЛЮЗ РАДМИН VPN (ОТПРАВКА ДАННЫХ)
+// БЛОК 2: СЕТЕВОЙ ШЛЮЗ (HTTP POST ДРУГУ)
 // =========================================================================
-const networkStatus = document.getElementById('network-status');
-const friendIpInput = document.getElementById('friend-ip');
-const connectBtn = document.getElementById('connect-btn');
-
-let isConnected = false;
-
-connectBtn.addEventListener('click', () => {
-    const ip = friendIpInput.value.trim();
-    if (!ip) return alert("Сначала введи IP хоста из Радмин VPN!");
-    
-    isConnected = true;
-    networkStatus.innerText = `СЕТЬ: ПОДКЛЮЧЕНО К ${ip}. СИНХРОНИЗАЦИЯ НАЧАТА!`;
-    networkStatus.style.color = "#00ffcc";
-    
-    // Отправляем стартовый пакет для калибровки
-    sendFilterToFriend(cutoffSlider.value);
-});
-
-// Функция, которая пушит текущие координаты ручки на Go-сервер твоего друга
 async function sendFilterToFriend(cutoffVal) {
     const ip = friendIpInput.value.trim();
-    if (!isConnected || !ip) return; // Если коннект не нажат — сеть не спамим
+    if (!isConnected || !ip) return;
 
     try {
         await fetch(`http://${ip}:5500/sync`, {
@@ -99,45 +138,35 @@ async function sendFilterToFriend(cutoffVal) {
     }
 }
 
-
 // =========================================================================
-// БЛОК 3: СОБЫТИЙНЫЙ ПРИЕМ (НА ТИХИХ WEBSOCKET-СОКЕТАХ)
+// БЛОК 3: СОБЫТИЙНЫЙ ПРИЕМ (WEBSOCKET СВОЕГО СЕРВЕРА)
 // =========================================================================
 const ws = new WebSocket('ws://127.0.0.1:5500');
 let lastReceivedTimestamp = 0;
 
 ws.onopen = () => {
-    console.log("[WS] Локальный мост активен. Готов принимать крутилки от друга!");
+    console.log("[WS] Локальный мост активен.");
 };
 
-// Вызывается ТОЛЬКО тогда, когда от друга реально прилетел пакет. CPU отдыхает!
 ws.onmessage = (event) => {
     try {
         const data = JSON.parse(event.data);
         
-        // Проверяем тип пакета и актуальность метки времени
         if (data.type === 'SYNTH_CUTOFF' && data.timestamp > lastReceivedTimestamp) {
             lastReceivedTimestamp = data.timestamp;
             const incomingValue = data.value;
             
-            // 1. Двигаем ползунок на экране хоста
             cutoffSlider.value = incomingValue;
             cutoffValue.innerText = `${incomingValue} Hz`;
             
-            // 2. Крутим частоту фильтра в звуковом движке хоста
             if (filter && audioCtx) {
                 filter.frequency.setValueAtTime(incomingValue, audioCtx.currentTime);
             }
         }
-    } catch (e) {
-        // Ошибки парсинга битых пакетов не ломают нам джем
-    }
+    } catch (e) {}
 };
 
-ws.onerror = () => {
-    // Тихо глушим ошибку, если пользователь открыл сайт, но еще не запустил .exe
-};
-
+ws.onerror = () => {};
 ws.onclose = () => {
-    console.log("[WS] Сетевой мост закрыт. Перезапусти сервер, если это произошло случайно.");
+    console.log("[WS] Локальный мост закрыт.");
 };

@@ -4,42 +4,111 @@
     <meta charset="UTF-8">
     <title>MESHLOG-PORT95</title>
     <style>
-        body { background: #000; color: #00ffcc; font-family: monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; gap: 15px; }
-        button, .download-btn { background: transparent; border: 2px solid #00ffcc; color: #00ffcc; padding: 12px 24px; font-size: 14px; cursor: pointer; box-shadow: 0 0 10px #00ffcc; font-family: monospace; text-decoration: none; display: inline-block; text-align: center; }
-        button:hover, .download-btn:hover { background: #00ffcc; color: #000; }
-        input { background: #111; border: 1px solid #ff00ff; color: #ff00ff; padding: 10px; font-family: monospace; text-align: center; font-size: 16px; width: 250px; }
-        .panel { border: 1px dashed #ff00ff; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
-        #network-status { color: #ff00ff; font-size: 14px; text-shadow: 0 0 5px #ff00ff; }
+        body { 
+            background: #000; 
+            color: #00ffcc; 
+            font-family: monospace; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            gap: 15px; 
+        }
+        button, .download-btn { 
+            background: transparent; 
+            border: 2px solid #00ffcc; 
+            color: #00ffcc; 
+            padding: 12px 24px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            box-shadow: 0 0 10px #00ffcc; 
+            font-family: monospace; 
+            text-decoration: none; 
+            display: inline-block; 
+            text-align: center; 
+        }
+        button:hover, .download-btn:hover { 
+            background: #00ffcc; 
+            color: #000; 
+        }
+        input { 
+            background: #111; 
+            border: 1px solid #ff00ff; 
+            color: #ff00ff; 
+            padding: 10px; 
+            font-family: monospace; 
+            text-align: center; 
+            font-size: 16px; 
+            width: 250px; 
+        }
+        .panel { 
+            border: 1px dashed #ff00ff; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            align-items: center; 
+            max-width: 500px;
+        }
+        #network-status { 
+            color: #ff00ff; 
+            font-size: 14px; 
+            text-shadow: 0 0 5px #ff00ff; 
+        }
+        /* Класс для скрытия экранов */
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
-    <button id="start-btn">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
-    <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
 
-    <div class="panel">
-        <h3>ЕСЛИ ТЫ ХОСТ (СТРИМЕР ЗВУКА):</h3>
+    <div id="lobby-screen" class="panel" style="border-color: #00ffcc;">
+        <h2>MESHLOG-PORT95 // СЕТЕВОЙ СЕКТОР</h2>
         
+        <p style="font-size: 12px; color: #666; margin: 0;">1. СКАЧАЙТЕ СЕТЕВОЙ МОСТ ПОД СВОЮ ОС:</p>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <a href="meshlog-server.exe" class="download-btn" style="border-color: #00ffcc; color: #00ffcc;">
-                🪟 СКАЧАТЬ ДЛЯ WINDOWS (.EXE)
-            </a>
-            
-            <a href="meshlog-server-mac-arm64" class="download-btn" style="border-color: #ff00ff; color: #ff00ff; box-shadow: 0 0 10px #ff00ff;">
-                🍏 СКАЧАТЬ ДЛЯ MAC (M1/M2/M3)
-            </a>
+            <a href="meshlog-server.exe" class="download-btn" style="border-color: #00ffcc; color: #00ffcc; font-size: 11px;">🪟 WINDOWS (.EXE)</a>
+            <a href="meshlog-server-mac-arm64" class="download-btn" style="border-color: #ff00ff; color: #ff00ff; font-size: 11px;">🍏 MAC (M1/M2/M3)</a>
+            <a href="meshlog-server-mac-intel" class="download-btn" style="border-color: #ffff00; color: #ffff00; font-size: 11px;">🍏 MAC (INTEL)</a>
         </div>
 
-        <div style="margin-top: 15px; padding: 10px; border: 1px dashed #666; max-width: 400px; text-align: left; font-size: 11px; color: #aaa;">
-            <b style="color: #ff00ff;">⚠️ ИНСТРУКЦИЯ ДЛЯ MAC:</b><br>
-            1. Скачай файл и закинь в папку "Загрузки".<br>
-            2. Открой Терминал на Маке и введи команду:<br>
-            <code style="background: #222; color: #00ffcc; padding: 2px 5px; display: inline-block; margin: 4px 0;">cd ~/Downloads && chmod +x meshlog-server-mac-arm64 && ./meshlog-server-mac-arm64</code><br>
-            3. Нажми Enter. Сервер запустится!
+        <button id="mac-help-btn" style="border-color: #666; color: #aaa; box-shadow: none; font-size: 11px; padding: 5px 10px; margin-top: 5px;">
+            ❓ ИНСТРУКЦИЯ ДЛЯ MAC
+        </button>
+
+        <div id="mac-help-block" class="hidden" style="padding: 10px; border: 1px dashed #ff00ff; max-width: 400px; text-align: left; font-size: 11px; color: #aaa; background: #050505;">
+            <b style="color: #ff00ff;">⚠️ ЗАПУСК НА СИСТЕМЕ MAC:</b><br>
+            1. Скачай нужный файл сервера.<br>
+            2. Открой встроенное приложение <b>Терминал</b>.<br>
+            3. Скопируй и выполни команду ниже (она выдаст права и запустит мост):<br>
+            <code style="background: #222; color: #00ffcc; padding: 4px; display: block; margin: 6px 0; word-break: break-all; font-size: 10px;">cd ~/Downloads && chmod +x meshlog-server-mac-arm64 && ./meshlog-server-mac-arm64</code>
+            <span style="font-size: 9px; color: #666;">*Если у тебя процессор Intel, замени в конце arm64 на intel</span>
         </div>
+
+        <hr style="width: 100%; border: 0; border-top: 1px dashed #333; margin: 10px 0;">
+
+        <p style="font-size: 12px; color: #666; margin: 0;">2. ИНИЦИАЛИЗАЦИЯ СЕССИИ ДЖЕМА:</p>
+        <input type="text" id="friend-ip" placeholder="ВВЕДИ IP ДРУГА ИЗ РАДМИНА">
         
-        <p style="font-size: 10px; color: #666; max-width: 380px; text-align: center; margin: 5px 0 0 0;">
-            Держи черное окно терминала открытым во время всего джема.
-        </p>
+        <div style="display: flex; gap: 15px;">
+            <button id="connect-btn">ПОДКЛЮЧИТЬСЯ К ДРУГУ</button>
+            <button id="host-btn" style="border-color: #ff00ff; color: #ff00ff; box-shadow: 0 0 10px #ff00ff;">СОЗДАТЬ СЕССИЮ</button>
+        </div>
+    </div>
+
+    <div id="work-screen" class="panel hidden" style="border-color: #ff00ff;">
+        <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
+        
+        <button id="start-btn" style="width: 100%;">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px;">
+            <label for="cutoff-slider" style="font-size: 12px; color: #00ffcc;">CUTOFF FREQUENCY (АНАЛОГОВЫЙ ФИЛЬТР):</label>
+            <input type="range" id="cutoff-slider" min="40" max="4000" value="1000" style="width: 320px;">
+            <span id="cutoff-value" style="color: #ff00ff; font-size: 18px; font-weight: bold;">1000 Hz</span>
+        </div>
     </div>
 
     <script src="main.js"></script>
