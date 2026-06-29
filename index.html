@@ -4,81 +4,42 @@
     <meta charset="UTF-8">
     <title>MESHLOG-PORT95</title>
     <style>
-        body { 
-            background: #000; 
-            color: #00ffcc; 
-            font-family: monospace; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            gap: 15px; 
-        }
-        button, .download-btn { 
-            background: transparent; 
-            border: 2px solid #00ffcc; 
-            color: #00ffcc; 
-            padding: 12px 24px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            box-shadow: 0 0 10px #00ffcc; 
-            font-family: monospace; 
-            text-decoration: none; 
-            display: inline-block; 
-            text-align: center; 
-        }
-        button:hover, .download-btn:hover { 
-            background: #00ffcc; 
-            color: #000; 
-        }
-        input { 
-            background: #111; 
-            border: 1px solid #ff00ff; 
-            color: #ff00ff; 
-            padding: 10px; 
-            font-family: monospace; 
-            text-align: center; 
-            font-size: 16px; 
-            width: 250px; 
-        }
-        .panel { 
-            border: 1px dashed #ff00ff; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            align-items: center; 
-        }
-        #network-status { 
-            color: #ff00ff; 
-            font-size: 14px; 
-            text-shadow: 0 0 5px #ff00ff; 
-        }
+        body { background: #000; color: #00ffcc; font-family: monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; gap: 15px; }
+        button, .download-btn { background: transparent; border: 2px solid #00ffcc; color: #00ffcc; padding: 12px 24px; font-size: 14px; cursor: pointer; box-shadow: 0 0 10px #00ffcc; font-family: monospace; text-decoration: none; display: inline-block; text-align: center; }
+        button:hover, .download-btn:hover { background: #00ffcc; color: #000; }
+        input { background: #111; border: 1px solid #ff00ff; color: #ff00ff; padding: 10px; font-family: monospace; text-align: center; font-size: 16px; width: 250px; }
+        .panel { border: 1px dashed #ff00ff; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        #network-status { color: #ff00ff; font-size: 14px; text-shadow: 0 0 5px #ff00ff; }
     </style>
 </head>
 <body>
     <button id="start-btn">ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ЯДРА</button>
     <div id="network-status">СЕТЬ: ОЖИДАНИЕ ЛОКАЛЬНОГО МОСТА</div>
 
-    <div class="panel" style="border-color: #00ffcc;">
-        <h3>КОНТРОЛЬ СИНТЕЗАТОРА</h3>
-        <label for="cutoff-slider" style="font-size: 12px; color: #00ffcc;">CUTOFF FREQUENCY (ФИЛЬТР):</label>
-        <input type="range" id="cutoff-slider" min="40" max="4000" value="1000" style="width: 300px;">
-        <span id="cutoff-value" style="color: #ff00ff;">1000 Hz</span>
-    </div>
-
     <div class="panel">
         <h3>ЕСЛИ ТЫ ХОСТ (СТРИМЕР ЗВУКА):</h3>
-        <a href="https://github.com/sever4user/MESHLOG-PORT95/releases/download/v0.95/meshlog-server.exe" class="download-btn">🚀 СКАЧАТЬ СЕРВЕР ЗАПУСКА (.EXE)</a>
-        <p style="font-size: 10px; color: #666; max-width: 280px; text-align: center;">Просто скачай, запусти двойным кликом и не закрывай черное окно во время джема.</p>
-    </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <a href="meshlog-server.exe" class="download-btn" style="border-color: #00ffcc; color: #00ffcc;">
+                🪟 СКАЧАТЬ ДЛЯ WINDOWS (.EXE)
+            </a>
+            
+            <a href="meshlog-server-mac-arm64" class="download-btn" style="border-color: #ff00ff; color: #ff00ff; box-shadow: 0 0 10px #ff00ff;">
+                🍏 СКАЧАТЬ ДЛЯ MAC (M1/M2/M3)
+            </a>
+        </div>
 
-    <div class="panel">
-        <h3>ЕСЛИ ТЫ ПОДКЛЮЧАЕШЬСЯ К ДРУГУ:</h3>
-        <input type="text" id="friend-ip" placeholder="ВВЕДИ IP ДРУГА ИЗ РАДМИНА">
-        <button id="connect-btn">СИНХРОНИЗИРОВАТЬ ДЖЕМ</button>
+        <div style="margin-top: 15px; padding: 10px; border: 1px dashed #666; max-width: 400px; text-align: left; font-size: 11px; color: #aaa;">
+            <b style="color: #ff00ff;">⚠️ ИНСТРУКЦИЯ ДЛЯ MAC:</b><br>
+            1. Скачай файл и закинь в папку "Загрузки".<br>
+            2. Открой Терминал на Маке и введи команду:<br>
+            <code style="background: #222; color: #00ffcc; padding: 2px 5px; display: inline-block; margin: 4px 0;">cd ~/Downloads && chmod +x meshlog-server-mac-arm64 && ./meshlog-server-mac-arm64</code><br>
+            3. Нажми Enter. Сервер запустится!
+        </div>
+        
+        <p style="font-size: 10px; color: #666; max-width: 380px; text-align: center; margin: 5px 0 0 0;">
+            Держи черное окно терминала открытым во время всего джема.
+        </p>
     </div>
 
     <script src="main.js"></script>
